@@ -1,4 +1,5 @@
 from game_logic import PUZZLES, GameSession
+from puzzle_generator import generate_puzzle
 import sys
 
 def clear_screen():
@@ -11,11 +12,22 @@ def main():
     
     # 获取可用的汤列表
     for p in PUZZLES:
-        print(f"[{p['id']}] {p['title']}")
+        title = p.get('title', '未命名汤品')
+        print(f"[{p['id']}] {title}")
+    print(f"[G] 随机生成一个新谜题 (大模型发散思维)")
     
     try:
-        choice = int(input("\n请选择一个汤品（输入数字 1-3）: "))
-        selected_puzzle = next((p for p in PUZZLES if p["id"] == choice), None)
+        user_input = input("\n请选择一个汤品（输入数字 1-3 或 G）: ").strip().upper()
+        
+        if user_input == 'G':
+            print("\n正在通过大模型发散思维生成新谜题，请稍候...")
+            selected_puzzle = generate_puzzle()
+            if not selected_puzzle:
+                print("谜题生成失败，请检查网络或 API 配置。")
+                return
+        else:
+            choice = int(user_input)
+            selected_puzzle = next((p for p in PUZZLES if p["id"] == choice), None)
         
         if not selected_puzzle:
             print("选择无效，程序退出。")
@@ -47,8 +59,14 @@ def main():
             # 使用 LangChain 进行推理
             try:
                 print("海龟汤主持人思考中...")
-                response = session.ask(question)
+                response, finished = session.ask(question)
                 print(f"[主持人回答] << {response}")
+                
+                if finished:
+                    print("\n" + "*" * 40)
+                    print("检测到游戏结束信号：恭喜你成功解开了谜题！")
+                    print("*" * 40)
+                    break
                 
             except Exception as e:
                 print(f"\n[错误] 主持人似乎走神了（API 报错）: {e}")
@@ -56,7 +74,7 @@ def main():
                 break
                 
     except ValueError:
-        print("请输入有效的数字。")
+        print("请输入有效的指令（数字或 G）。")
     except KeyboardInterrupt:
         print("\n退出游戏。")
 
