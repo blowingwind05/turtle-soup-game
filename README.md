@@ -12,9 +12,9 @@
 ## 运行步骤
 
 1. **配置环境**
-   由于 `.env` 文件已被 Git 忽略，请将 `.env.example` 复制并重命名为 `.env`，然后填入您的 API 配置（支持 ModelScope 等 OpenAI 兼容接口）：
+   请将 `.env.example` 重命名为 `.env`，然后填入您的 API 配置（支持 ModelScope 等 OpenAI 兼容接口）：
    ```bash
-   cp .env.example .env
+   mv .env.example .env
    ```
    在 `.env` 中修改如下项：
    ```env
